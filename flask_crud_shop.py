@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///products.db'
+
+# SQLite с абсолютным путём
+db_path = os.path.join(os.path.dirname(__file__), 'products.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-with app.app_context():
-    db.create_all()
 
+# ---------------- Модель ----------------
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -18,6 +20,11 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     date_added = db.Column(db.String(20), nullable=False)
 
+# ---------------- Создаём таблицы ----------------
+with app.app_context():
+    db.create_all()
+
+# ---------------- CRUD API ----------------
 @app.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
@@ -90,6 +97,4 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
