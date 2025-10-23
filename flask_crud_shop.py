@@ -16,9 +16,6 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     date_added = db.Column(db.String(20), nullable=False)
 
-# ---------------- CRUD API ----------------
-
-# Получить все товары
 @app.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
@@ -34,7 +31,6 @@ def get_products():
         })
     return jsonify(result), 200
 
-# Получить товар по id
 @app.route('/products/<int:id>', methods=['GET'])
 def get_product(id):
     product = Product.query.get(id)
@@ -49,7 +45,6 @@ def get_product(id):
         'date_added': product.date_added
     }), 200
 
-# Добавить новый товар
 @app.route('/products', methods=['POST'])
 def add_product():
     data = request.get_json()
@@ -67,7 +62,6 @@ def add_product():
     db.session.commit()
     return jsonify({'message': 'Product added', 'id': new_product.id}), 201
 
-# Обновить товар
 @app.route('/products/<int:id>', methods=['PUT'])
 def update_product(id):
     product = Product.query.get(id)
@@ -80,7 +74,6 @@ def update_product(id):
     db.session.commit()
     return jsonify({'message': 'Product updated'}), 200
 
-# Удалить товар
 @app.route('/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
     product = Product.query.get(id)
@@ -90,7 +83,6 @@ def delete_product(id):
     db.session.commit()
     return jsonify({'message': 'Product deleted'}), 200
 
-# ---------------- Главная страница ----------------
 @app.route('/')
 def home():
     return render_template('index.html')
