@@ -91,6 +91,7 @@ def delete_product(id):
 @app.route('/')
 def home():
     return render_template('index.html')
+
 @app.route('/warehouse')
 def warehouse():
     products = Product.query.all()
