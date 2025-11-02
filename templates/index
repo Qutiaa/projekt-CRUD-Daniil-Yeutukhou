@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Главная страница магазина</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Главная страница магазина</h1>
+
+  <button onclick="window.location.href='/'">Перейти в склад</button>
+
+  <h2>Список товаров</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Название</th>
+        <th>Цена</th>
+        <th>Остаток</th>
+      </tr>
+    </thead>
+    <tbody id="mainProducts"></tbody>
+  </table>
+
+  <script>
+    const apiUrl = '/products';
+
+    async function fetchMainProducts() {
+      const res = await fetch(apiUrl);
+      const products = await res.json();
+      const tbody = document.getElementById('mainProducts');
+      tbody.innerHTML = '';
+      products.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.name}</td>
+          <td>${p.price} ₽</td>
+          <td>${p.quantity}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    fetchMainProducts();
+  </script>
+</body>
+</html>
