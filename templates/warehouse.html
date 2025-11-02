@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD Sklep-internetowy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Sklep z towarami</h1>
+
+<button onclick="window.location.href='/'">Sklep</button>
+
+  <h2>Dodaj produkt</h2>
+  <input id="name" placeholder="Nazwa">
+  <input id="category" placeholder="Kategoria">
+  <input id="price" placeholder="Cena" type="number">
+  <input id="quantity" placeholder="Ilosc" type="number">
+  <input id="date_added" placeholder="Data (YYYY-MM-DD)">
+  <button onclick="addProduct()">Dodac</button>
+
+  <h2>Lista produktów</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Nazwa</th><th>Kategoria</th><th>Cena</th><th>Ilość</th><th>Data</th><th>Dzialania</th>
+      </tr>
+    </thead>
+    <tbody id="productsTable"></tbody>
+  </table>
+
+  <script>
+    const apiUrl = '/products';
+
+    async function fetchProducts() {
+      const res = await fetch(apiUrl);
+      const products = await res.json();
+      const tbody = document.getElementById('productsTable');
+      tbody.innerHTML = '';
+      products.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.id}</td>
+          <td contenteditable="true">${p.name}</td>
+          <td contenteditable="true">${p.category}</td>
+          <td contenteditable="true">${p.price}</td>
+          <td contenteditable="true">${p.quantity}</td>
+          <td contenteditable="true">${p.date_added}</td>
+          <td>
+            <button onclick="updateProduct(${p.id}, this)">Aktualizacja</button>
+            <button onclick="deleteProduct(${p.id})">Usuwac</button>
+          </td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function addProduct() {
+      const data = {
+        name: document.getElementById('name').value,
+        category: document.getElementById('category').value,
+        price: parseFloat(document.getElementById('price').value),
+        quantity: parseInt(document.getElementById('quantity').value),
+        date_added: document.getElementById('date_added').value
+      };
+      await fetch(apiUrl, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      fetchProducts();
+    }
+
+    async function updateProduct(id, btn) {
+      const row = btn.parentElement.parentElement;
+      const data = {
+        name: row.cells[1].innerText,
+        category: row.cells[2].innerText,
+        price: parseFloat(row.cells[3].innerText),
+        quantity: parseInt(row.cells[4].innerText),
+        date_added: row.cells[5].innerText
+      };
+      await fetch(`${apiUrl}/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      fetchProducts();
+    }
+
+    async function deleteProduct(id) {
+      await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+      fetchProducts();
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>
