@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
   <title>CRUD Sklep-internetowy</title>
@@ -8,15 +8,41 @@
 <body>
   <h1>Sklep z towarami</h1>
 
-<button onclick="window.location.href='/'">Sklep</button>
+  <button onclick="window.location.href='/logout'" class="navigate">Wyloguj</button>
 
-  <h2>Dodaj produkt</h2>
-  <input id="name" placeholder="Nazwa">
-  <input id="category" placeholder="Kategoria">
-  <input id="price" placeholder="Cena" type="number">
-  <input id="quantity" placeholder="Ilosc" type="number">
-  <input id="date_added" placeholder="Data (YYYY-MM-DD)">
-  <button onclick="addProduct()">Dodac</button>
+  <div class="add-product-container">
+    <h2>Dodaj produkt</h2>
+    <div class="add-product">
+      <div class="form-group">
+        <input id="name" placeholder="Nazwa">
+        <div id="error-name" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <input id="category" placeholder="Kategoria">
+        <div id="error-category" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <input id="price" placeholder="Cena" type="number">
+        <div id="error-price" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <input id="quantity" placeholder="Ilosc" type="number">
+        <div id="error-quantity" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <input id="date_added" placeholder="Data (YYYY-MM-DD)">
+        <div id="error-date_added" class="field-error"></div>
+      </div>
+
+      <div class="form-group">
+        <button onclick="addProduct()">Dodac</button>
+      </div>
+    </div>
+  </div>
 
   <h2>Lista produktów</h2>
   <table>
@@ -28,70 +54,6 @@
     <tbody id="productsTable"></tbody>
   </table>
 
-  <script>
-    const apiUrl = '/products';
-
-    async function fetchProducts() {
-      const res = await fetch(apiUrl);
-      const products = await res.json();
-      const tbody = document.getElementById('productsTable');
-      tbody.innerHTML = '';
-      products.forEach(p => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${p.id}</td>
-          <td contenteditable="true">${p.name}</td>
-          <td contenteditable="true">${p.category}</td>
-          <td contenteditable="true">${p.price}</td>
-          <td contenteditable="true">${p.quantity}</td>
-          <td contenteditable="true">${p.date_added}</td>
-          <td>
-            <button onclick="updateProduct(${p.id}, this)">Aktualizacja</button>
-            <button onclick="deleteProduct(${p.id})">Usuwac</button>
-          </td>`;
-        tbody.appendChild(row);
-      });
-    }
-
-    async function addProduct() {
-      const data = {
-        name: document.getElementById('name').value,
-        category: document.getElementById('category').value,
-        price: parseFloat(document.getElementById('price').value),
-        quantity: parseInt(document.getElementById('quantity').value),
-        date_added: document.getElementById('date_added').value
-      };
-      await fetch(apiUrl, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      });
-      fetchProducts();
-    }
-
-    async function updateProduct(id, btn) {
-      const row = btn.parentElement.parentElement;
-      const data = {
-        name: row.cells[1].innerText,
-        category: row.cells[2].innerText,
-        price: parseFloat(row.cells[3].innerText),
-        quantity: parseInt(row.cells[4].innerText),
-        date_added: row.cells[5].innerText
-      };
-      await fetch(`${apiUrl}/${id}`, {
-        method: 'PUT',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      });
-      fetchProducts();
-    }
-
-    async function deleteProduct(id) {
-      await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-      fetchProducts();
-    }
-
-    fetchProducts();
-  </script>
+  <script src="{{ url_for('static', filename='warehouse.js') }}"></script>
 </body>
 </html>
